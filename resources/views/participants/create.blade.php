@@ -94,7 +94,8 @@
         </div>
     @endif
 
-    <form action="{{ route('participants.store') }}" method="POST">
+    @if (Gate::allows('create-participant'))
+        <form action="{{ route('participants.store') }}" method="POST">
         @csrf
         <div class="mb-3">
             <label for="name" class="form-label">ПІБ:</label>
@@ -142,6 +143,9 @@
 
         <button type="submit" class="btn btn-primary">Додати учасника</button>
     </form>
+    @else
+        <p>У вас немає прав доступу для створення учасників.</p>
+    @endif
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

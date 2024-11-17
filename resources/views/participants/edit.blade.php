@@ -91,44 +91,51 @@
     </style>
 </head>
 <body>
-<h2>Редагувати учасника</h2>
 
+@can('update', $participant)
+    <h2>Редагувати учасника</h2>
 
-<form action="{{ route('participants.update', $participant->id) }}" method="POST">
-    @csrf
-    @method('PUT')  <!-- This specifies the form will use the PUT method -->
+    <form action="{{ route('participants.update', $participant->id) }}" method="POST">
+        @csrf
+        @method('PUT')  <!-- This specifies the form will use the PUT method -->
 
-    <div>
-        <label for="name">ПІБ:</label>
-        <input type="text" name="name" id="name" value="{{ old('name', $participant->name) }}" required>
+        <div>
+            <label for="name">ПІБ:</label>
+            <input type="text" name="name" id="name" value="{{ old('name', $participant->name) }}" required>
+        </div>
+
+        <div>
+            <label for="gender">Стать:</label>
+            <select name="gender" id="gender" required>
+                <option value="M" {{ $participant->gender == 'M' ? 'selected' : '' }}>Чоловік</option>
+                <option value="F" {{ $participant->gender == 'F' ? 'selected' : '' }}>Жінка</option>
+            </select>
+        </div>
+
+        <div>
+            <label for="age">Вік:</label>
+            <input type="number" name="age" id="age" value="{{ old('age', $participant->age) }}" required min="0">
+        </div>
+
+        <div>
+            <label for="country">Країна:</label>
+            <input type="text" name="country" id="country" value="{{ old('country', $participant->country) }}" required>
+        </div>
+
+        <div>
+            <label for="scores">Оцінки (через кому):</label>
+            <input type="text" name="scores" id="scores" value="{{ old('scores', $participant->scores ) }}" required>
+        </div>
+
+        <div>
+            <button type="submit">Зберегти зміни</button>
+        </div>
+    </form>
+@else
+    <div class="alert alert-danger">
+        Ви не маєте дозволу редагувати цього учасника.
     </div>
+@endcan
 
-    <div>
-        <label for="gender">Стать:</label>
-        <select name="gender" id="gender" required>
-            <option value="M" {{ $participant->gender == 'M' ? 'selected' : '' }}>Чоловік</option>
-            <option value="F" {{ $participant->gender == 'F' ? 'selected' : '' }}>Жінка</option>
-        </select>
-    </div>
-
-    <div>
-        <label for="age">Вік:</label>
-        <input type="number" name="age" id="age" value="{{ old('age', $participant->age) }}" required min="0">
-    </div>
-
-    <div>
-        <label for="country">Країна:</label>
-        <input type="text" name="country" id="country" value="{{ old('country', $participant->country) }}" required>
-    </div>
-
-    <div>
-        <label for="scores">Оцінки (через кому):</label>
-        <input type="text" name="scores" id="scores" value="{{ old('scores', $participant->scores ) }}" required>
-    </div>
-
-    <div>
-        <button type="submit">Зберегти зміни</button>
-    </div>
-</form>
 </body>
 </html>

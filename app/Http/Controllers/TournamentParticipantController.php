@@ -4,25 +4,37 @@ namespace App\Http\Controllers;
 
 use App\Models\TournamentParticipant;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class TournamentParticipantController extends Controller
 {
+    public function __construct()
+    {
+        // Додайте перевірку доступу до створення учасника
+        $this->middleware('can:create-participant')->only('create', 'store');
+    }
     public function index()
     {
         $participants = TournamentParticipant::all();
 
+        if (Gate::denies('view', TournamentParticipant::class)) {
+            abort(403, 'You do not have permission to view participants.');
+        }
+
         return view('participants.index', compact('participants'));
     }
 
-
-
     public function create()
     {
-        return view('participants.create'); // Show the form
+        $this->authorize('create', TournamentParticipant::class); // або Gate::denies
+
+        return view('participants.create');
     }
 
     public function store(Request $request)
     {
+        $this->authorize('create', TournamentParticipant::class);
+
         $data = $request->validate([
             'name' => 'required|string|max:255',
             'gender' => 'required|in:M,F',
@@ -44,6 +56,8 @@ class TournamentParticipantController extends Controller
             return redirect()->route('participants.index')->with('error', 'Participant not found');
         }
 
+        $this->authorize('view', $participant);
+
         $participantScores = $participant->scores;
         return view('participants.show', compact('participant', 'participantScores'));
     }
@@ -56,6 +70,8 @@ class TournamentParticipantController extends Controller
             return redirect()->route('participants.index')->with('error', 'Participant not found');
         }
 
+        $this->authorize('update', $participant);
+
         return view('participants.edit', compact('participant'));
     }
 
@@ -66,6 +82,8 @@ class TournamentParticipantController extends Controller
         if (!$participant) {
             return redirect()->route('participants.index')->with('error', 'Учасника не знайдено');
         }
+
+        $this->authorize('update', $participant);
 
         $data = $request->validate([
             'name' => 'required|string|max:255',
@@ -80,11 +98,13 @@ class TournamentParticipantController extends Controller
         return redirect()->route('participants.index')->with('success', 'Дані учасника оновлені');
     }
 
-
-    public function destroy(TournamentParticipant $participant)
+    public function delete(TournamentParticipant $participant)
     {
+        $this->authorize('delete', $participant);
+
         $participant->delete();
 
         return redirect()->route('participants.index');
     }
 }
+

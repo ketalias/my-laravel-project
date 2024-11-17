@@ -1,5 +1,3 @@
-<!-- resources/views/participants/index.blade.php -->
-
 <!DOCTYPE html>
 <html lang="uk">
 <head>
@@ -116,21 +114,27 @@
             <td>{{ $participant->gender == 'M' ? 'Чоловік' : 'Жінка' }}</td>
             <td>{{ $participant->age }}</td>
             <td>{{ $participant->country }}</td>
-            <td>{{ $participant->scores  }}</td>
+            <td>{{ $participant->scores }}</td>
             <td>
-                <a href="{{ route('participants.edit', $participant->id) }}">Редагувати</a>
-                <form action="{{ route('participants.destroy', $participant->id) }}" method="POST"
-                      style="display:inline;">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit">Видалити</button>
-                </form>
+                @can('update', $participant)
+                    <a href="{{ route('participants.edit', $participant->id) }}">Редагувати</a>
+                @endcan
+
+                @can('delete', $participant)
+                    <form action="{{ route('participants.destroy', $participant->id) }}" method="POST" style="display:inline;">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit">Видалити</button>
+                    </form>
+                @endcan
             </td>
         </tr>
     @endforeach
     </tbody>
 </table>
 
-<a href="{{ route('participants.create') }}">Додати нового учасника</a>
+@can('create-participant')
+    <a href="{{ route('participants.create') }}">Додати нового учасника</a>
+@endcan
 </body>
 </html>
